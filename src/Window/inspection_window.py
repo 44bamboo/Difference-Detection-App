@@ -1,6 +1,7 @@
 import tkinter as tk
 from PIL import Image, ImageTk
 from Window.camera_settings_window import  CameraSettingWindow
+from Window.img_processing_window import  IMGProcessingWindow
 import tkinter.filedialog
 
 import cv2
@@ -8,7 +9,7 @@ import numpy as np
 import os
 
 
-version = 1.1
+version = 0.3
 Canvas_size = [600, 450]
 
 class InspectionWindow():
@@ -17,8 +18,8 @@ class InspectionWindow():
         # self.cap = cv2.VideoCapture(1, cv2.CAP_DSHOW)  #Windows用 Linuxでは動かないため廃止 遅延発生の恐れありhttps://madeinpc.blog.fc2.com/blog-entry-1361.html?sp
         self.cap = cv2.VideoCapture(1)  # Linux用 
 
-        self.cap.set(cv2.CAP_PROP_AUTO_EXPOSURE, 0)
-        self.cap.set(cv2.CAP_PROP_AUTO_WB, 0)
+        self.cap.set(cv2.CAP_PROP_AUTO_EXPOSURE, 1)
+        # self.cap.set(cv2.CAP_PROP_AUTO_WB, 0)
         self.base_image = np.array([])
         self.camera_image = np.array([])
         self.analusis_image = np.array([])
@@ -28,7 +29,7 @@ class InspectionWindow():
         # ウィンドウの作成
         self.root = root # Create the main application window
         self.root.title("異差検出ツール v" + str(version))
-        self.root.geometry("1280x600")  # Set window size (width x height)
+        self.root.geometry("1300x650")  # Set window size (width x height)
 
         self.root.resizable(False, False)        # サイズを固定
       
@@ -40,24 +41,29 @@ class InspectionWindow():
         self.canvas2 = tk.Canvas(root, width = Canvas_size[0], height = Canvas_size[1], bg="gray")
 
         #キャンバスバインド
-        self.canvas1.place(x=20, y=40)
-        self.canvas2.place(x=660, y=40)
+        self.canvas1.place(x=20, y=100)
+        self.canvas2.place(x=660, y=100)
 
         # ファイルメニュー
         self.file_menu = tk.Menu(self.menu_bar, tearoff=0)
         self.file_menu.add_command(label="標準画像選択", command=self.OpenImage)
         self.file_menu.add_command(label="標準画像確認", command=self.ConfirmationImage)
-        self.file_menu.add_command(label="検査画像保存", command=self.SeaveImageAnalusis)
+        self.file_menu.add_command(label="標準画像保存", command=self.SeaveBaseImage)
+        self.file_menu.add_command(label="検査画像保存", command=self.SeaveAnalusisImage)
         self.file_menu.add_separator()
-        self.file_menu.add_command(label="終了", command=self.exit_app)
+        self.file_menu.add_command(label="終了", command=self.ExitApp)
         self.menu_bar.add_cascade(label="ファイル", menu=self.file_menu)
 
         # 設定メニュー
         self.setting = tk.Menu(self.menu_bar, tearoff=0)
-        self.setting.add_command(label="カメラ設定", command=self.OpenCamWindow)
-        self.setting.add_command(label="標準画像設定", command=lambda: tk.messagebox.showinfo("検査設定画面", "未実装 デフォルト値固定" ))
+        self.setting.add_command(label="カメラ設定", command=self.OpenCamSetWindow)
         self.setting.add_command(label="検査設定", command=lambda: tk.messagebox.showinfo("設定画面", "未実装 閾値値固定" ))
         self.menu_bar.add_cascade(label="設定", menu=self.setting)
+
+        # 編集メニュー
+        self.editing = tk.Menu(self.menu_bar, tearoff=0)
+        self.editing.add_command(label="標準画像編集", command=self.OpenImgProWindow)
+        self.menu_bar.add_cascade(label="編集", menu=self.editing)
 
         # ヘルプメニュー
         self.help_menu = tk.Menu(self.menu_bar, tearoff=0)
@@ -66,37 +72,42 @@ class InspectionWindow():
 
         root.config(menu=self.menu_bar)
 
-        
+        # 管理情報
+        self.administrative_label1 = tk.Label(root, text= "品番情報", font=("メイリオ", "10", "normal"), bg="lightgrey")
+        self.administrative_label1.place(x=22, y=10, width=100, height=35)
+        self.administrative_label2 = tk.Label(root, text= "未設定 - 画像を選択してください", font=("メイリオ", "10", "normal"), bg="white", foreground="red")  
+        self.administrative_label2.place(x=122, y=10, width=1140, height=35)
+
         # ラベル
         self.lbl1 = tk.Label(root, text='検査画面', font=("メイリオ", "15", "normal"), bg="lightgrey")
-        self.lbl1.place(x=22, y=5, width=600, height=35)
+        self.lbl1.place(x=22, y=65, width=600, height=35)
         self.lbl2 = tk.Label(root, text='検査結果', font=("メイリオ", "15", "normal"), bg="lightgrey")
-        self.lbl2.place(x=662, y=5, width=600, height=35)
+        self.lbl2.place(x=662, y=65, width=600, height=35)
         self.lbl3 = tk.Label(root, text='ログ  ※未実装')
-        self.lbl3.place(x=30, y=500)
+        self.lbl3.place(x=30, y=560)
         self.txt = tk.Entry(root, bg="lightgrey" )
-        self.txt.place(x=20, y=520, width=800, height=50)
+        self.txt.place(x=20, y=580, width=800, height=60)
 
         # ボタン
-        self.button1 = tk.Button(root, text="検査", bg="slategrey", command=self.on_button1)
-        self.button1.place(x=870, y=510, width=100, height=60) 
-        self.button2 = tk.Button(root, text="標準画像更新", bg="slategrey", command=self.base_image_updata)
-        self.button2.place(x=1000, y=510, width=100, height=60)
-        self.button2 = tk.Button(root, text="検査画像保存", bg="slategrey", command=self.SeaveImageAnalusis)
-        self.button2.place(x=1130, y=510, width=100, height=60)
+        self.button1 = tk.Button(root, text="検査", bg="slategrey", command=self.OnButton1)
+        self.button1.place(x=870, y=580, width=100, height=60) 
+        self.button2 = tk.Button(root, text="標準画像更新", bg="slategrey", command=self.UpdateBaseImage)
+        self.button2.place(x=1000, y=580, width=100, height=60)
+        self.button2 = tk.Button(root, text="検査画像保存", bg="slategrey", command=self.SeaveAnalusisImage)
+        self.button2.place(x=1130, y=580, width=100, height=60)
 
-        self.root.bind("<Return>", self.on_enter)
+        self.root.bind("<Return>", self.OnEnter)
 
-        self.updata_frame()
+        self.UpdataFrame()
 
     def ConfirmationImage(self):
         if  self.base_image.size == 0:
             tk.messagebox.showinfo("メッセージ", "標準画像が設定されていません")
             return
         else :
-            self.custom_messagebox()
+            self.CustomMessagebox()
 
-    def photo_shoot(self):
+    def PhotoShoot(self):
 
         file_path = tk.filedialog.asksaveasfilename(
         defaultextension=".png",  # デフォルトの拡張子
@@ -116,7 +127,7 @@ class InspectionWindow():
 
           
 
-    def SeaveImageAnalusis(self):
+    def SeaveAnalusisImage(self):
         if  self.analusis_image.size == 0:
             tk.messagebox.showinfo("メッセージ", "検査画像がありません")
             return
@@ -136,9 +147,9 @@ class InspectionWindow():
 
         except Exception as e:
             print(e)
-            
-    def seave_image_base(self):
-        if  self.base_image.size == 0:
+
+    def SeaveBaseImage(self):
+        if   self.base_image.size == 0:
             tk.messagebox.showinfo("メッセージ", "検査画像がありません")
             return
         
@@ -155,10 +166,11 @@ class InspectionWindow():
                 with open(file_path, mode='w+b') as f:
                     n.tofile(f)
 
+            file_name_without_ext = os.path.splitext(os.path.basename(str(f)))[0]
+            self.administrative_label2.config(text=file_name_without_ext, foreground="black")
+
         except Exception as e:
-            print(e)
-
-
+            print(e) 
 
 
     def OpenImage(self):
@@ -171,26 +183,27 @@ class InspectionWindow():
             cv_image = cv2.imdecode(n, cv2.IMREAD_COLOR)
             self.base_image  = cv_image
             tk.messagebox.showinfo("メッセージ", "標準画像を登録しました")
+
+            file_name_without_ext = os.path.splitext(os.path.basename(str(file_path)))[0]
+            self.administrative_label2.config(text=file_name_without_ext, foreground="black")
             
              
         except Exception as e:
             print(e)
             return None
         
-    def base_image_updata(self):
+    def UpdateBaseImage(self):
         self.base_image = self.camera_image
+        self.administrative_label2.config(text="カメラ画像が選択されています")
 
 
     # 終了関数
-    def exit_app(self):
+    def ExitApp(self):
         self.root.quit()
         self.root.destroy()
         self.cap.release()
 
-    def camera_setting(self):
-        tk.messagebox.showinfo("未実装")
-
-    def on_enter(self, event):
+    def OnEnter(self, event):
         
         if  self.base_image.size == 0:
             tk.messagebox.showinfo("メッセージ", "標準画像を設定してください")
@@ -215,12 +228,12 @@ class InspectionWindow():
             self.canvas2.delete("all")
             
 
-    def on_button1(self):
+    def OnButton1(self):
         
         if  self.base_image.size == 0:
             tk.messagebox.showinfo("メッセージ", "標準画像を設定してください")
             return
-        
+
         if  self.lbl2.cget("text") == "検査結果":
             result = self.Analusis() 
             if result:
@@ -239,7 +252,7 @@ class InspectionWindow():
             self.button1["text"] = "検査"
             self.canvas2.delete("all")
 
-    def updata_frame(self):
+    def UpdataFrame(self):
         ret, frame = self.cap.read()
         if ret:
             # OpenCVのBGRをRGBに変換
@@ -254,11 +267,10 @@ class InspectionWindow():
             self.canvas1.image = tk_image 
         
         # 10msごとに更新
-        self.root.after(10, self.updata_frame)
+        self.root.after(10, self.UpdataFrame)
 
-    def custom_messagebox(self):
+    def CustomMessagebox(self):
         # 新しいウィンドウを作成
-        print("test")
         messagebox = tk.Toplevel(self.root)
         messagebox.title("標準画像 確認画面")
         messagebox.geometry("400x400")
@@ -280,9 +292,20 @@ class InspectionWindow():
         ok_button = tk.Button(messagebox, text="OK", command=messagebox.destroy)
         ok_button.pack(pady=10)
 
-    def OpenCamWindow(self):
+    def OpenCamSetWindow(self):
+        self.root.lower()
         self.newWindow = tk.Toplevel( self.root )
         self.app = CameraSettingWindow(self.newWindow, self.cap)
+
+    def OpenImgProWindow(self):
+        if   self.base_image.size == 0:
+            tk.messagebox.showinfo("メッセージ", "標準画像が設定されていません")
+            return
+        self.app = IMGProcessingWindow( self.root , self.base_image)
+
+        is_update , img =  self.app.ReturnImg()
+        if is_update:
+            self.base_image = img
 
     def Analusis(self):
         self.analusis_image = self.camera_image

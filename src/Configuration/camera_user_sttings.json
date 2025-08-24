@@ -15,32 +15,32 @@
             },
             "カメラ制御": {
                 "Zoom": 0,
-                "Focus": 64,
-                "Exposure": 9,
+                "Focus": 6,
+                "Exposure": 62,
                 "Squeeze": 0,
                 "tIris": 0,
-                "WhitePan": 70,
-                "Tilt": 67,
-                "Rotation": 0
+                "WhitePan": 121,
+                "Tilt": 100,
+                "Rotation": 64
             }
         },
         {
             "name": "設定2",
             "画像の調整": {
-                "Brightness": 190,
-                "Contrast": 47,
-                "Hue": 128,
-                "Saturation": 43,
+                "Brightness": 0,
+                "Contrast": 32,
+                "Hue": 0,
+                "Saturation": 75,
                 "Pinto": 24,
-                "Gamma": 35,
-                "WhiteBalance": 217,
+                "Gamma": 100,
+                "WhiteBalance": 4600,
                 "Backlight": 1,
                 "Gain": 0
             },
             "カメラ制御": {
                 "Zoom": 0,
                 "Focus": 0,
-                "Exposure": 55,
+                "Exposure": 0,
                 "Squeeze": 0,
                 "tIris": 0,
                 "WhitePan": 0,
