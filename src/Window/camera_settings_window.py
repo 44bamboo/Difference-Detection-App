@@ -114,7 +114,7 @@ class CameraSettingWindow :
         self.chk_Ba = tk.Checkbutton(self.img_tab) # 逆光補正(Ba)
         self.chk_Ga = tk.Checkbutton(self.img_tab) # ゲイン(Ga)
        
-        self.img_defo_button = tk.Button(self.img_tab, text="規定値", command=self.UpdataImgParameter)  
+        self.img_defo_button = tk.Button(self.img_tab, text="規定値", command=self.UpdataImgParameter) 
 
         self.label_Auto1.grid(row=1,  column=4)
 
@@ -256,8 +256,6 @@ class CameraSettingWindow :
 
         self.cam_defo_button.grid(row=11, column=2)
 
-
-
         self.combobox.grid(row=0,  column=1, sticky=tk.NW)
         self.notebook.grid(row=1,  column=1, sticky=tk.NW, columnspan=2)
 
@@ -383,6 +381,11 @@ class CameraSettingWindow :
     ###################################################
     ##################### Change ######################
     ###################################################
+
+    def ChangeCombobox(self, event):
+        self.UpdataAllParameter()
+
+
     def ChangeTextBrightness(self, num):
         self.txt_Br.delete(0, tk.END)
         self.txt_Br.insert(0, num) 
@@ -811,8 +814,6 @@ class CameraSettingWindow :
         else:
             self.volume_slider_R.set( int(event))
 
-    def ChangeCombobox(self, event):
-        self.UpdataAllParameter()
 
     ######################################################
     ##################### interface ######################
@@ -826,12 +827,12 @@ class CameraSettingWindow :
         if img_Parameters== None or cam_Parameters  == None:
             pass
         else:
-            with open('v_1.1\Configuration\camera_user_sttings.json', "w", encoding="utf-8") as file:
+            with open('src\Configuration\camera_user_sttings.json', "w", encoding="utf-8") as file:
                 self.cam_settings_data[ "User_Setting_data"][self.combobox.current()] = {"name":self.combobox.get(),"画像の調整":img_Parameters,"カメラ制御": cam_Parameters}
                 json.dump(self.cam_settings_data, file, ensure_ascii=False, indent=4)
 
     def ReadCamSettings(self):
-        with open('v_1.1\Configuration\camera_user_sttings.json', 'r', encoding='utf-8') as file:
+        with open('src\Configuration\camera_user_sttings.json', 'r', encoding='utf-8') as file:
             data = json.load(file)
         return data
 
