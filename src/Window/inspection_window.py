@@ -56,9 +56,13 @@ class InspectionWindow():
         # 設定メニュー
         self.setting = tk.Menu(self.menu_bar, tearoff=0)
         self.setting.add_command(label="カメラ設定", command=self.OpenCamSetWindow)
-        self.setting.add_command(label="標準画像編集", command=self.OpenImgProWindow)
         self.setting.add_command(label="検査設定", command=lambda: tk.messagebox.showinfo("設定画面", "未実装 閾値値固定" ))
         self.menu_bar.add_cascade(label="設定", menu=self.setting)
+
+        # 編集メニュー
+        self.editing = tk.Menu(self.menu_bar, tearoff=0)
+        self.editing.add_command(label="標準画像編集", command=self.OpenImgProWindow)
+        self.menu_bar.add_cascade(label="編集", menu=self.editing)
 
         # ヘルプメニュー
         self.help_menu = tk.Menu(self.menu_bar, tearoff=0)
