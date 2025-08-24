@@ -234,18 +234,23 @@ class InspectionWindow():
             tk.messagebox.showinfo("メッセージ", "標準画像を設定してください")
             return
 
+        # テキストの更新
         if  self.lbl2.cget("text") == "検査結果":
             result = self.Analusis() 
             if result:
                 self.lbl2["text"] = " 検査結果 ≪≪ 異常 ≫≫ "
                 self.lbl2["bg"] = "red"
+                self.root.configure(bg="red")
             else:
                 self.lbl2["text"] = " 検査結果 ≪≪ 正常 ≫≫ "
                 self.lbl2["bg"] = "green2"
+                self.root.configure(bg="green2")
         else :
             self.lbl2["text"] = "検査結果"
             self.lbl2["bg"] = "slategrey"
+            self.root.configure(bg="slategrey")
 
+        # キャンパス部分の更新
         if  self.button1.cget("text") == "検査":
             self.button1["text"] = "リセット"
         else :
