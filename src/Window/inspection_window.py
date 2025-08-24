@@ -48,7 +48,8 @@ class InspectionWindow():
         self.file_menu = tk.Menu(self.menu_bar, tearoff=0)
         self.file_menu.add_command(label="標準画像選択", command=self.OpenImage)
         self.file_menu.add_command(label="標準画像確認", command=self.ConfirmationImage)
-        self.file_menu.add_command(label="検査画像保存", command=self.SeaveImageAnalusis)
+        self.file_menu.add_command(label="標準画像保存", command=self.SeaveBaseImage)
+        self.file_menu.add_command(label="検査画像保存", command=self.SeaveAnalusisImage)
         self.file_menu.add_separator()
         self.file_menu.add_command(label="終了", command=self.ExitApp)
         self.menu_bar.add_cascade(label="ファイル", menu=self.file_menu)
@@ -75,7 +76,7 @@ class InspectionWindow():
         self.administrative_label1 = tk.Label(root, text= "品番情報", font=("メイリオ", "10", "normal"), bg="lightgrey")
         self.administrative_label1.place(x=22, y=10, width=100, height=35)
         self.administrative_label2 = tk.Label(root, text= "未設定 - 画像を選択してください", font=("メイリオ", "10", "normal"), bg="white", foreground="red")  
-        self.administrative_label2.place(x=122, y=10, width=1100, height=35)
+        self.administrative_label2.place(x=122, y=10, width=1140, height=35)
 
         # ラベル
         self.lbl1 = tk.Label(root, text='検査画面', font=("メイリオ", "15", "normal"), bg="lightgrey")
@@ -92,7 +93,7 @@ class InspectionWindow():
         self.button1.place(x=870, y=580, width=100, height=60) 
         self.button2 = tk.Button(root, text="標準画像更新", bg="slategrey", command=self.UpdateBaseImage)
         self.button2.place(x=1000, y=580, width=100, height=60)
-        self.button2 = tk.Button(root, text="検査画像保存", bg="slategrey", command=self.SeaveImageAnalusis)
+        self.button2 = tk.Button(root, text="検査画像保存", bg="slategrey", command=self.SeaveAnalusisImage)
         self.button2.place(x=1130, y=580, width=100, height=60)
 
         self.root.bind("<Return>", self.OnEnter)
@@ -126,7 +127,7 @@ class InspectionWindow():
 
           
 
-    def SeaveImageAnalusis(self):
+    def SeaveAnalusisImage(self):
         if  self.analusis_image.size == 0:
             tk.messagebox.showinfo("メッセージ", "検査画像がありません")
             return
@@ -144,11 +145,32 @@ class InspectionWindow():
                 with open(file_path, mode='w+b') as f:
                     n.tofile(f)
 
-            self.administrative_label2.config(text=f, foreground="black")
-
         except Exception as e:
             print(e)
+
+    def SeaveBaseImage(self):
+        if   self.base_image.size == 0:
+            tk.messagebox.showinfo("メッセージ", "検査画像がありません")
+            return
+        
+        file_path = tk.filedialog.asksaveasfilename(
+        defaultextension=".png",  # デフォルトの拡張子
+        filetypes=[("画像ファイル", "*.png;*.jpg")],
+        title="検査画像を保存"
+        )
+        try:
+            ext = os.path.splitext(file_path)[1]
+            result, n = cv2.imencode(ext, self.base_image  , None)
             
+            if result:
+                with open(file_path, mode='w+b') as f:
+                    n.tofile(f)
+
+            file_name_without_ext = os.path.splitext(os.path.basename(str(f)))[0]
+            self.administrative_label2.config(text=file_name_without_ext, foreground="black")
+
+        except Exception as e:
+            print(e) 
 
 
     def OpenImage(self):
@@ -161,6 +183,9 @@ class InspectionWindow():
             cv_image = cv2.imdecode(n, cv2.IMREAD_COLOR)
             self.base_image  = cv_image
             tk.messagebox.showinfo("メッセージ", "標準画像を登録しました")
+
+            file_name_without_ext = os.path.splitext(os.path.basename(str(file_path)))[0]
+            self.administrative_label2.config(text=file_name_without_ext, foreground="black")
             
              
         except Exception as e:
