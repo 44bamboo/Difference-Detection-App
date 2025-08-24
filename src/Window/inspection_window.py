@@ -29,7 +29,7 @@ class InspectionWindow():
         # ウィンドウの作成
         self.root = root # Create the main application window
         self.root.title("異差検出ツール v" + str(version))
-        self.root.geometry("1280x600")  # Set window size (width x height)
+        self.root.geometry("1400x700")  # Set window size (width x height)
 
         self.root.resizable(False, False)        # サイズを固定
       
@@ -264,12 +264,11 @@ class InspectionWindow():
         if   self.base_image.size == 0:
             tk.messagebox.showinfo("メッセージ", "標準画像が設定されていません")
             return
-        self.newWindow = tk.Toplevel( self.root )
-        self.app = IMGProcessingWindow(self.newWindow, self.base_image)
+        self.app = IMGProcessingWindow( self.root , self.base_image)
 
-        self.root. wait_window(self.app)
-        cv2.imshow("hoge",self.app.copy_img)
-        self.base_image =self.app.copy_img
+        is_update , img =  self.app.ReturnImg()
+        if is_update:
+            self.base_image = img
 
     def Analusis(self):
         self.analusis_image = self.camera_image
