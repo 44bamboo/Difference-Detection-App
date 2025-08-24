@@ -29,7 +29,7 @@ class InspectionWindow():
         # ウィンドウの作成
         self.root = root # Create the main application window
         self.root.title("異差検出ツール v" + str(version))
-        self.root.geometry("1400x700")  # Set window size (width x height)
+        self.root.geometry("1300x650")  # Set window size (width x height)
 
         self.root.resizable(False, False)        # サイズを固定
       
@@ -41,8 +41,8 @@ class InspectionWindow():
         self.canvas2 = tk.Canvas(root, width = Canvas_size[0], height = Canvas_size[1], bg="gray")
 
         #キャンバスバインド
-        self.canvas1.place(x=20, y=40)
-        self.canvas2.place(x=660, y=40)
+        self.canvas1.place(x=20, y=100)
+        self.canvas2.place(x=660, y=100)
 
         # ファイルメニュー
         self.file_menu = tk.Menu(self.menu_bar, tearoff=0)
@@ -71,24 +71,29 @@ class InspectionWindow():
 
         root.config(menu=self.menu_bar)
 
-        
+        # 管理情報
+        self.administrative_label1 = tk.Label(root, text= "品番情報", font=("メイリオ", "10", "normal"), bg="lightgrey")
+        self.administrative_label1.place(x=22, y=10, width=100, height=35)
+        self.administrative_label2 = tk.Label(root, text= "未設定 - 画像を選択してください", font=("メイリオ", "10", "normal"), bg="white", foreground="red")  
+        self.administrative_label2.place(x=122, y=10, width=1100, height=35)
+
         # ラベル
         self.lbl1 = tk.Label(root, text='検査画面', font=("メイリオ", "15", "normal"), bg="lightgrey")
-        self.lbl1.place(x=22, y=5, width=600, height=35)
+        self.lbl1.place(x=22, y=65, width=600, height=35)
         self.lbl2 = tk.Label(root, text='検査結果', font=("メイリオ", "15", "normal"), bg="lightgrey")
-        self.lbl2.place(x=662, y=5, width=600, height=35)
+        self.lbl2.place(x=662, y=65, width=600, height=35)
         self.lbl3 = tk.Label(root, text='ログ  ※未実装')
-        self.lbl3.place(x=30, y=500)
+        self.lbl3.place(x=30, y=560)
         self.txt = tk.Entry(root, bg="lightgrey" )
-        self.txt.place(x=20, y=520, width=800, height=50)
+        self.txt.place(x=20, y=580, width=800, height=60)
 
         # ボタン
         self.button1 = tk.Button(root, text="検査", bg="slategrey", command=self.OnButton1)
-        self.button1.place(x=870, y=510, width=100, height=60) 
+        self.button1.place(x=870, y=580, width=100, height=60) 
         self.button2 = tk.Button(root, text="標準画像更新", bg="slategrey", command=self.UpdateBaseImage)
-        self.button2.place(x=1000, y=510, width=100, height=60)
+        self.button2.place(x=1000, y=580, width=100, height=60)
         self.button2 = tk.Button(root, text="検査画像保存", bg="slategrey", command=self.SeaveImageAnalusis)
-        self.button2.place(x=1130, y=510, width=100, height=60)
+        self.button2.place(x=1130, y=580, width=100, height=60)
 
         self.root.bind("<Return>", self.OnEnter)
 
@@ -139,6 +144,8 @@ class InspectionWindow():
                 with open(file_path, mode='w+b') as f:
                     n.tofile(f)
 
+            self.administrative_label2.config(text=f, foreground="black")
+
         except Exception as e:
             print(e)
             
@@ -162,6 +169,7 @@ class InspectionWindow():
         
     def UpdateBaseImage(self):
         self.base_image = self.camera_image
+        self.administrative_label2.config(text="カメラ画像が選択されています")
 
 
     # 終了関数
