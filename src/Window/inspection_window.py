@@ -80,9 +80,9 @@ class InspectionWindow():
 
         # ラベル
         self.lbl1 = tk.Label(root, text='検査画面', font=("メイリオ", "15", "normal"), bg="lightgrey")
-        self.lbl1.place(x=22, y=65, width=600, height=35)
+        self.lbl1.place(x=22, y=65, width=600, height=30)
         self.lbl2 = tk.Label(root, text='検査結果', font=("メイリオ", "15", "normal"), bg="lightgrey")
-        self.lbl2.place(x=662, y=65, width=600, height=35)
+        self.lbl2.place(x=662, y=65, width=600, height=30)
         self.lbl3 = tk.Label(root, text='ログ  ※未実装')
         self.lbl3.place(x=30, y=560)
         self.txt = tk.Entry(root, bg="lightgrey" )
@@ -234,18 +234,30 @@ class InspectionWindow():
             tk.messagebox.showinfo("メッセージ", "標準画像を設定してください")
             return
 
+        # テキストの更新
         if  self.lbl2.cget("text") == "検査結果":
             result = self.Analusis() 
             if result:
                 self.lbl2["text"] = " 検査結果 ≪≪ 異常 ≫≫ "
-                self.lbl2["bg"] = "red"
+                self.lbl2.config( foreground="red")
+                self.lbl3 .config(bg="red1")
+                # self.lbl2["bg"] = "red3"
+                self.root.configure(bg="red1")
             else:
                 self.lbl2["text"] = " 検査結果 ≪≪ 正常 ≫≫ "
-                self.lbl2["bg"] = "green2"
+                self.lbl2.config( foreground="green3")
+                self.lbl3 .config(bg="green1")
+                # self.lbl2["bg"] = "green3"
+                self.root.configure(bg="green1")
         else :
             self.lbl2["text"] = "検査結果"
-            self.lbl2["bg"] = "slategrey"
+            # self.lbl2["bg"] = "slategrey"
+            self.lbl2.config( foreground="black")
+            self.root.configure(bg="snow2")
+            self.lbl3 .config(bg="snow2")
 
+
+        # キャンパス部分の更新
         if  self.button1.cget("text") == "検査":
             self.button1["text"] = "リセット"
         else :

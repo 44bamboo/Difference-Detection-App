@@ -124,7 +124,7 @@ class IMGProcessingWindow :
          self.img_processing_window.destroy()
 
     def SelectionIMGRange(self):
-        tk.messagebox.showinfo("範囲選択", "検査を実施したい範囲の四隅を選択してください" )
+        tk.messagebox.showinfo("範囲選択", "検査を実施したい範囲を左上・右上・左下・右下の順で選択してください" )
         # クリックイベントをバインド
         self.canvas.bind("<Button-1>", self.DrawCircle)
 
