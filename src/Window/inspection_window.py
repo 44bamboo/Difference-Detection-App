@@ -2,6 +2,7 @@ import tkinter as tk
 from PIL import Image, ImageTk
 from Window.camera_settings_window import  CameraSettingWindow
 from Window.img_processing_window import  IMGProcessingWindow
+from Window.abnormal_handlers_window import  AbnormalHandlerWindow
 import tkinter.filedialog
 
 import cv2
